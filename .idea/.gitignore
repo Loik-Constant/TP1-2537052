@@ -1,0 +1,11 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+# Editor-based HTTP Client requests
+/httpRequests/
+# L'environnement virtuel
+.venv/
+# La cache Python
+__pycache__
+# Les fichier contenant les mots de passe
+*.json
