@@ -38,7 +38,7 @@ class PasswordGenerator:
 
         if category_amount == 0:
             return -1
-        if self.length < category_amount:
+        if self.length < category_amount and self.validate:
             return -2
 
         password = ""
@@ -81,6 +81,3 @@ class PasswordGenerator:
                 if character1 == character2:
                     return True
         return False
-
-test = PasswordGenerator(0, False, False, False, True, True)
-print(test.generate_password())
