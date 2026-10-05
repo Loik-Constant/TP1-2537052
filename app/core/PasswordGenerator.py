@@ -17,9 +17,6 @@ class PasswordGenerator:
         self.no_symbols = no_symbols
         self.validate = validate
 
-    # Génère un mot de passe selon les caractéristiques spécifié et le retourne.
-    # Si aucun type de caractère n'est permis, retourne -1
-    # Si le nombre de types de caractère différents est plus grand que la longueur du mot de passe, retourne -2
     def generate_password(self):
         valid_characters = []
         category_amount = 0
@@ -36,10 +33,12 @@ class PasswordGenerator:
             [valid_characters.append(x) for x in PasswordGenerator.symbols]
             category_amount += 1
 
+        if self.length <= 0:
+            raise ValueError("")
         if category_amount == 0:
-            return -1
+            raise ValueError("Il doit y avoir au moins un type de caractère sélectionné")
         if self.length < category_amount and self.validate:
-            return -2
+            raise ValueError("La longueur est trop courte pour générer un mot de passe contenant chaque type de caractère spécifié")
 
         password = ""
         valid = False
@@ -57,7 +56,6 @@ class PasswordGenerator:
 
         return password
 
-    # Vérifie si le mot de passe contient au moins un caractère de chaque type de caractère demandé
     def password_is_valid(self, password):
         if (not self.no_lower and
             not PasswordGenerator.password_has_character_type(password, PasswordGenerator.lower_letters)):
@@ -73,7 +71,6 @@ class PasswordGenerator:
             return False
         return True
 
-    # Vérifie si le mot de passe contient au moins un caractère contenu dans la liste de caractères.
     @staticmethod
     def password_has_character_type(password, character_list):
         for character1 in password:
