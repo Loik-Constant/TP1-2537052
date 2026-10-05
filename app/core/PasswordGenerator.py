@@ -34,7 +34,7 @@ class PasswordGenerator:
             category_amount += 1
 
         if self.length <= 0:
-            raise ValueError("")
+            raise ValueError("La longueur doit être plus grande que 0")
         if category_amount == 0:
             raise ValueError("Il doit y avoir au moins un type de caractère sélectionné")
         if self.length < category_amount and self.validate:

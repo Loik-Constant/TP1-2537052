@@ -27,15 +27,12 @@ def main():
 
     args = parser.parse_args()
 
-    passwordGenerator = PasswordGenerator(args.length, args.no_lower, args.no_upper, args.no_digits, args.no_symbols, args.validate)
-    password = passwordGenerator.generate_password()
+    password_generator = PasswordGenerator(args.length, args.no_lower, args.no_upper, args.no_digits, args.no_symbols, args.validate)
+    try:
+        print(password_generator.generate_password())
+    except ValueError as e:
+        print(f"Erreur : {e}")
 
-    if password == -1:
-        print("ERREUR: Vous devez spécifier au moins un type de caractère valide")
-    elif password == -2:
-        print("ERREUR: La longueur est trop courte pour générer un mot de passe contenant chaque types de caractère spécifié")
-    else:
-        print("Mot de passe généré: " + password)
 
 
 if __name__ == "__main__":
