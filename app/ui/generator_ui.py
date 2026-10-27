@@ -86,7 +86,7 @@ class PasswordGeneratorUi(QWidget):
         layout.addRow(self.button_layout)
 
 
-        self.setFixedSize(375, 220)
+        self.setMinimumSize(375, 220)
         self.setLayout(layout)
 
 
@@ -169,8 +169,7 @@ class PasswordGeneratorUi(QWidget):
             self.password_is_hidden = False
             self.hide_button.setText("Masquer")
         else:
-            self.password_label.setText("")
-            [self.password_label.setText(self.password_label.text() + "*") for x in self.password]
+            self.password_label.setText(self.censor(self.password))
             self.password_is_hidden = True
             self.hide_button.setText("Afficher")
 
@@ -179,6 +178,23 @@ class PasswordGeneratorUi(QWidget):
         Copie le mot de passe dans le presse-papier.
         """
         QApplication.clipboard().setText(self.password)
+
+    @staticmethod
+    def censor(password: str):
+        """
+        Retourne une chaine de caractères sous forme d'astérix.
+
+        :param password: La chaine de caractère à censurer.
+        :return: La chaine de caractère censurée.
+        """
+        censored_password = ""
+        for char in password:
+            censored_password += "*"
+        return censored_password
+
+
+
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
