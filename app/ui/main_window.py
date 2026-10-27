@@ -1,10 +1,10 @@
 import sys
-import time
 
 from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QScrollArea, QWidget, QListWidget, \
     QListWidgetItem, QPushButton, QHBoxLayout, QFormLayout, QLineEdit
 from PySide6.QtCore import QTimer, Signal
 
+from app.core.storage import PasswordStorage
 from app.ui.generator_ui import PasswordGeneratorUi
 
 
@@ -15,14 +15,17 @@ class EmailForm(QWidget):
     email_added = Signal(object)
 
     def __init__(self):
+        """
+        Initialise une nouvelle instance de EmailForm.
+        """
         super().__init__()
         self.setWindowTitle("Formulaire d'ajout d'email")
         self.setup_ui()
 
     def setup_ui(self):
         """
-                Génère les éléments de la fenêtre.
-                """
+        Génère les éléments de la fenêtre.
+        """
         layout = QFormLayout()
 
         self.email_edit = QLineEdit()
@@ -66,9 +69,11 @@ class MainWindow(QMainWindow):
     Fenêtre principale de l'application
     """
 
-    email_list = [{"email": "ok", "password": "123324234"}, {"email": "fuck", "password": "321"}, {"email": "joe", "password": "213"}]
-    def __init__(self):
+    email_list = []
+    def __init__(self, vault_file: str):
         super().__init__()
+        self.passwordStorage = PasswordStorage(vault_file)
+        self.setWindowTitle("Page d'acceuil")
         self.init_ui()
 
     def init_ui(self):
@@ -81,7 +86,7 @@ class MainWindow(QMainWindow):
         self.email_scrollarea = QScrollArea()
         self.email_list_widget = QListWidget()
         self.email_list_widget.doubleClicked.connect(self.show_password)
-        for email in self.email_list:
+        for email in self.passwordStorage.read_vault_file():
             self.add_email(email)
 
         self.email_scrollarea.setWidget(self.email_list_widget)
@@ -144,6 +149,8 @@ class MainWindow(QMainWindow):
         self.form.show()
 
     def add_email(self, email: dict[str, str]):
+        self.email_list.append(email)
+
         item = QListWidgetItem()
         item.setText(f"{email.get("email")} \n"
                      f"{self.censor(str(email.get("password")))}")
@@ -165,7 +172,6 @@ class MainWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = MainWindow()
-    window.setWindowTitle("Page d'acceuil")
+    window = MainWindow("vault.json")
     window.show()
     sys.exit(app.exec())

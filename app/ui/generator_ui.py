@@ -4,7 +4,7 @@ from PySide6.QtWidgets import QApplication, QWidget, QSlider, QSpinBox, QFormLay
     QHBoxLayout, QPushButton
 from PySide6.QtCore import Qt
 
-from app.core.PasswordGenerator import PasswordGenerator
+from app.core.generator import PasswordGenerator
 
 
 class PasswordGeneratorUi(QWidget):
@@ -16,6 +16,7 @@ class PasswordGeneratorUi(QWidget):
 
     def __init__(self):
         super().__init__()
+        self.setWindowTitle("Formulaire d'ajout d'email")
         self.init_ui()
 
     def init_ui(self):
@@ -199,6 +200,5 @@ class PasswordGeneratorUi(QWidget):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = PasswordGeneratorUi()
-    window.setWindowTitle("Générateur de mot de passe")
     window.show()
     sys.exit(app.exec())
