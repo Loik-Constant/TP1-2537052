@@ -111,6 +111,7 @@ class MainWindow(QMainWindow):
 
         self.add_button.clicked.connect(self.show_create_form)
         self.modify_button.clicked.connect(self.show_edit_form)
+        self.delete_button.clicked.connect(self.delete_email)
 
         self.button_layout = QHBoxLayout()
         self.button_layout.addWidget(self.add_button)
@@ -167,6 +168,11 @@ class MainWindow(QMainWindow):
         self.form.show()
 
     def add_email(self, email: dict[str, str]):
+        """
+        Ajoute un e-mail à la liste d'email.
+
+        :param email: L'e-mail qui sera ajouté
+        """
         self.email_list.append(email)
 
         item = QListWidgetItem()
@@ -175,11 +181,35 @@ class MainWindow(QMainWindow):
         self.email_list_widget.addItem(item)
 
     def edit_email(self, email: dict[str, str]):
-        self.email_list[self.email_list_widget.currentRow()] = email
+        """
+        Modifie l'e-mail sélectionné.
 
-        item = self.email_list_widget.currentItem()
-        item.setText(f"{email.get("email")} \n"
-                     f"{self.censor(str(email.get("password")))}")
+        :param email: Les nouvelles informations de l'e-mail
+        """
+        if len(self.email_list) > 0:
+            self.email_list[self.email_list_widget.currentRow()] = email
+
+            item = self.email_list_widget.currentItem()
+            item.setText(f"{email.get("email")} \n"
+                         f"{self.censor(str(email.get("password")))}")
+
+    def delete_email(self):
+        """
+        Supprime l'e-mail sélectionné.
+        """
+        if len(self.email_list) > 0:
+            row = self.email_list_widget.currentRow()
+
+            self.email_list.pop(row)
+            self.email_list_widget.takeItem(row)
+
+            self.form.close()
+
+            if len(self.email_list) == 0:
+                self.modify_button.setDisabled(True)
+                self.delete_button.setDisabled(True)
+
+
 
     @staticmethod
     def censor(password):
