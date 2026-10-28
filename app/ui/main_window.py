@@ -82,7 +82,7 @@ class MainWindow(QMainWindow):
     def __init__(self, vault_file: str):
         super().__init__()
         self.email_list = []
-        self.passwordStorage = PasswordStorage(vault_file)
+        self.password_storage = PasswordStorage(vault_file)
         self.setWindowTitle("Page d'acceuil")
         self.init_ui()
 
@@ -97,8 +97,11 @@ class MainWindow(QMainWindow):
         self.email_list_widget = QListWidget()
         self.email_list_widget.itemClicked.connect(self.enable_buttons)
         self.email_list_widget.itemDoubleClicked.connect(self.show_password)
-        for email in self.passwordStorage.read_vault_file():
-            self.add_email(email)
+        try:
+            for email in self.password_storage.read_vault_file():
+                self.add_email(email)
+        except FileNotFoundError:
+            self.password_storage.create_vault_file()
 
         self.email_scrollarea.setWidget(self.email_list_widget)
         self.email_scrollarea.setWidgetResizable(True)
@@ -120,6 +123,8 @@ class MainWindow(QMainWindow):
 
         layout.addWidget(self.email_scrollarea)
         layout.addLayout(self.button_layout)
+
+        self.form = EmailForm()
 
         self.setMinimumSize(375, 220)
         central_widget.setLayout(layout)
@@ -223,6 +228,9 @@ class MainWindow(QMainWindow):
         for char in password:
             censored_password += "*"
         return censored_password
+
+    def closeEvent(self, event):
+        self.password_storage.save_vault_file(self.email_list)
 
 
 if __name__ == "__main__":

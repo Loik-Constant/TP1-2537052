@@ -4,18 +4,17 @@ from plistlib import InvalidFileException
 
 
 class PasswordStorage:
-    def __init__(self, vault_file="vault.json"):
+    def __init__(self, vault_file="vault.json"):#"vault.json"):
         """
         Initialise une instance de PasswordStorage.
 
         :param vault_file: Le fichier .json dans lequel les données seront lues et enregistrées.
         """
         self.vault_file = vault_file
-        self.create_vault_file()
 
     def create_vault_file(self):
         """
-        Crée le fichier coffre-fort s'il n'existe pas déja
+        Crée un fichier coffre-fort vide
         """
         try:
             with open(self.vault_file, "w", encoding="utf-8") as file:
