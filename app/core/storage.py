@@ -4,7 +4,7 @@ from plistlib import InvalidFileException
 
 
 class PasswordStorage:
-    def __init__(self, vault_file="vault.json"):#"vault.json"):
+    def __init__(self, vault_file="vault.json"):
         """
         Initialise une instance de PasswordStorage.
 
