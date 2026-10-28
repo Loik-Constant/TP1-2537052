@@ -12,14 +12,20 @@ class EmailForm(QWidget):
     """
     Formulaire utilisé pour la création de nouvels emails.
     """
-    email_added = Signal(object)
+    email_submitted = Signal(object)
 
-    def __init__(self):
+    def __init__(self, email: dict[str, str] | None = None):
         """
         Initialise une nouvelle instance de EmailForm.
+
+        :param default_email: Les informations de l'e-mail présent dans le formulaire, utilisé lors de l'édition
         """
         super().__init__()
-        self.setWindowTitle("Formulaire d'ajout d'email")
+        self.email = email
+        if self.email is not None:
+            self.setWindowTitle("Formulaire d'édition d'email")
+        else:
+            self.setWindowTitle("Formulaire de création d'email")
         self.setup_ui()
 
     def setup_ui(self):
@@ -31,29 +37,34 @@ class EmailForm(QWidget):
         self.email_edit = QLineEdit()
         self.password_edit = QLineEdit()
 
+        if self.email is not None:
+            self.email_edit.setText(self.email.get("email"))
+            self.password_edit.setText(self.email.get("password"))
+
         layout.addRow("E-mail :", self.email_edit)
         layout.addRow("Mot de passe :", self.password_edit)
 
         self.generate_button = QPushButton("Générer")
-        self.create_button = QPushButton("Créer")
+        self.submit_button = QPushButton("Soumettre")
 
         self.generate_button.clicked.connect(self.show_password_generator)
-        self.create_button.clicked.connect(self.create_email)
+        self.submit_button.clicked.connect(self.submit_email)
 
         self.button_layout = QHBoxLayout()
         self.button_layout.addWidget(self.generate_button)
-        self.button_layout.addWidget(self.create_button)
+        self.button_layout.addWidget(self.submit_button)
         layout.addRow(self.button_layout)
 
         self.setLayout(layout)
 
-    def create_email(self):
+    def submit_email(self):
         """
         Crée un nouvel email avec l'information du formulaire
         """
-        person = {"email": self.email_edit.text(), "password": self.password_edit.text()}
-        self.email_added.emit(person)
+        email = {"email": self.email_edit.text(), "password": self.password_edit.text()}
+        self.email_submitted.emit(email)
         self.close()
+
 
     def show_password_generator(self):
         """
@@ -68,10 +79,9 @@ class MainWindow(QMainWindow):
     """
     Fenêtre principale de l'application
     """
-
-    email_list = []
     def __init__(self, vault_file: str):
         super().__init__()
+        self.email_list = []
         self.passwordStorage = PasswordStorage(vault_file)
         self.setWindowTitle("Page d'acceuil")
         self.init_ui()
@@ -85,7 +95,8 @@ class MainWindow(QMainWindow):
 
         self.email_scrollarea = QScrollArea()
         self.email_list_widget = QListWidget()
-        self.email_list_widget.doubleClicked.connect(self.show_password)
+        self.email_list_widget.itemClicked.connect(self.enable_buttons)
+        self.email_list_widget.itemDoubleClicked.connect(self.show_password)
         for email in self.passwordStorage.read_vault_file():
             self.add_email(email)
 
@@ -98,7 +109,8 @@ class MainWindow(QMainWindow):
         self.delete_button = QPushButton("Supprimer")
         self.delete_button.setDisabled(True)
 
-        self.add_button.clicked.connect(self.show_form)
+        self.add_button.clicked.connect(self.show_create_form)
+        self.modify_button.clicked.connect(self.show_edit_form)
 
         self.button_layout = QHBoxLayout()
         self.button_layout.addWidget(self.add_button)
@@ -119,9 +131,7 @@ class MainWindow(QMainWindow):
         self.modify_button.setDisabled(False)
         self.delete_button.setDisabled(False)
 
-        sender = self.sender()
-        if isinstance(sender, QListWidget):
-            print(sender.currentRow())
+        self.form.close()
 
     def show_password(self):
         """
@@ -140,12 +150,20 @@ class MainWindow(QMainWindow):
             item.setText(f"{email.get("email")} \n"
                          f"{self.censor(str(email.get("password")))}"))
 
-    def show_form(self):
+    def show_create_form(self):
         """
         Affiche le formulaire de création d'e-mail.
         """
         self.form = EmailForm()
-        self.form.email_added.connect(self.add_email)
+        self.form.email_submitted.connect(self.add_email)
+        self.form.show()
+
+    def show_edit_form(self):
+        """
+        Affiche le formulaire de modification d'e-mail.
+        """
+        self.form = EmailForm(self.email_list[self.email_list_widget.currentRow()])
+        self.form.email_submitted.connect(self.edit_email)
         self.form.show()
 
     def add_email(self, email: dict[str, str]):
@@ -155,6 +173,13 @@ class MainWindow(QMainWindow):
         item.setText(f"{email.get("email")} \n"
                      f"{self.censor(str(email.get("password")))}")
         self.email_list_widget.addItem(item)
+
+    def edit_email(self, email: dict[str, str]):
+        self.email_list[self.email_list_widget.currentRow()] = email
+
+        item = self.email_list_widget.currentItem()
+        item.setText(f"{email.get("email")} \n"
+                     f"{self.censor(str(email.get("password")))}")
 
     @staticmethod
     def censor(password):
