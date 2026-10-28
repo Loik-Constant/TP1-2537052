@@ -1,3 +1,5 @@
+# Loïk Constant, 2537052, Loik-Constant
+
 import json
 from json import JSONDecodeError
 from plistlib import InvalidFileException

@@ -1,3 +1,5 @@
+# Loïk Constant, 2537052, Loik-Constant
+
 import sys
 
 from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QScrollArea, QWidget, QListWidget, \
